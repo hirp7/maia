@@ -11,16 +11,16 @@ The latest version of maia covers following filter-types:
 - Lowpass Filter (LPF)
 - Bandpass Filter (BPF)
 
-in either butterworth or chebyshev characteristic.
+in either *butterworth* or *chebyshev* characteristic.
 
 Then you can either see the cartesian graph of filter characteristics, S-parameter and group delay by a method *.plot_summary()*
 
-![lpf_example_S](/images/lpf_example_S.png)
+![lpf_example_S](/images/LPF_Butterworth_2_4.png)
 
 
 or the schematic of LC ladder circuits with corresponding inductance and capacitance by a method *.schematic()*
 
-![lpf_example_S](/images/lpf_example_schematic.png)
+![lpf_example_S](/images/LPF_Butterworth_2_4_schematic.png)
 
 
 
