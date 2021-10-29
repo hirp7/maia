@@ -19,6 +19,7 @@ Then you can either see the cartesian graph of filter characteristics, S-paramet
 
 
 or the schematic of LC ladder circuits with corresponding inductance and capacitance by a method *.schematic()*
+
 ![lpf_example_S](/images/lpf_example_schematic.png)
 
 
