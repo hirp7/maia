@@ -11,7 +11,7 @@ setup(
     author = 'hirp7',
     author_email = 'izunyan@gmail.com',
     #packages = find_packages(exclude=('maia')),
-    packages = ['maia']
+    packages = ['maia'],
     url = 'https://github.com/hirp7/Maia',
     #download_url = '',
     keywords = ['RF', 'Microwave Engineering','Filter Design'],
