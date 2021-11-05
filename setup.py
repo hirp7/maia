@@ -1,15 +1,16 @@
 #from distutils.core import setup
 import setuptools
+import os, sys
+from setuptools import setup, find_packages
 
-
-setuptools.setup(
+setup(
     name = 'maia',
     version = '0.0.1',  # Ideally should be same as your GitHub release tag varsion
     description = 'Microwave passive filter design assistant tool',
     #long_description = readme,
     author = 'hirp7',
     author_email = 'izunyan@gmail.com',
-    #packages = find_packages(exclude=('maia'))
+    packages = find_packages(exclude=('maia'))
     url = 'https://github.com/hirp7/Maia',
     #download_url = '',
     keywords = ['RF', 'Microwave Engineering','Filter Design'],
@@ -19,7 +20,10 @@ setuptools.setup(
         'numpy',
         'scipy',
         'scikit-rf',
-        'wheel']
+        'wheel',
+        'matplotlib',
+        'copy',
+        'schemdraw']
 )
 
 
