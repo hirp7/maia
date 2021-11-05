@@ -2,7 +2,7 @@
 import setuptools
 
 
-setup(
+setuptools.setup(
     name = 'maia',
     version = '0.0.1',  # Ideally should be same as your GitHub release tag varsion
     description = 'Microwave passive filter design assistant tool',
