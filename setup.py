@@ -21,8 +21,6 @@ setup(
         'scipy',
         'scikit-rf',
         'wheel',
-        'matplotlib',
-        'copy',
         'schemdraw']
 )
 
