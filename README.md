@@ -13,19 +13,13 @@ The latest version of maia covers following filters:
 
 in either *butterworth* or *chebyshev* type.
 
-attributes are:
+Once a object is defined, one can see the summary of results(Fig.1) and schematic(Fig.2) by methods, *.plot_summary()* and *.schematic()*, respectively.
 
-
-methods are
-Then you can either see the cartesian graph of filter characteristics, S-parameter and group delay by a method *.plot_summary()*
 
 ![lpf_example_S](/images/LPF_Butterworth_2_4.png)
-
-
-or the schematic of LC ladder circuits with corresponding inductance and capacitance by a method *.schematic()*
-
+(Fig.1)
 ![lpf_example_S](/images/LPF_Butterworth_2_4_schematic.png)
-
+(Fig.2)
 
 
 
