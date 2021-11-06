@@ -17,9 +17,11 @@ Once a object is defined, one can see the summary of results (Fig. 1) and schema
 
 
 ![lpf_example_S](/images/LPF_Butterworth_2_4.png)
+
 (Fig.1)
 
 ![lpf_example_S](/images/LPF_Butterworth_2_4_schematic.png)
+
 (Fig.2)
 
 
