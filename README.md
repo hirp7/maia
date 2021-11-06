@@ -13,11 +13,12 @@ The latest version of maia covers following filters:
 
 in either *butterworth* or *chebyshev* type.
 
-Once a object is defined, one can see the summary of results(Fig.1) and schematic(Fig.2) by methods, *.plot_summary()* and *.schematic()*, respectively.
+Once a object is defined, one can see the summary of results (Fig. 1) and schematic (Fig. 2) by methods, *.plot_summary()* and *.schematic()*, respectively.
 
 
 ![lpf_example_S](/images/LPF_Butterworth_2_4.png)
 (Fig.1)
+
 ![lpf_example_S](/images/LPF_Butterworth_2_4_schematic.png)
 (Fig.2)
 
