@@ -1,17 +1,18 @@
 # maia, microwave passive filter design assistant 
-is a support tool for RF passive filter design based on microwave filter synthesis theory.
-Using the insertion loss method, one can obtain a required filter design parameters such as g-parameters, transformed inductance and capacitance for ladder LC circuit from the princple low pass filter in accordance with filter requirements such as center frequency fc, fractional bandwidth FBW, ripple band Lar, and the number of stage N, 
-A class *LowPassFilter()* is easily created with filter specification as shown below.
+is a support tool for RF passive filter design based on the insertion loss method.
+Using integrated modules, one can obtain filter design parameters such as g-parameters for LC-ladder circuit, transformed inductance and capacitance LC from the princple LPF, and *network object in scikit-rf*.
+Depending on a filter requirement such as center frequency *fc*, fractional bandwidth *FBW* (for BPF), ripple band *Lar* in dB (for chebyshev-type), and the number of stage *N*, a object *LowPassFilter* or *BandPassFilter* is easily defined as shown below:
 
     lpf_flat = LowPassFilter(N=5,fc=2.0e9,Base='C_base',Type='Butterworth',f_start=0.1,f_stop = 4)
+
     lpf_chebyshev = LowPassFilter(N=5,fc=2.0e9,Base='C_base',Type='Chebyshev',f_start=0.1,f_stop = 4,ripple = 3.0)
 
-The latest version of maia covers following filter-types:
+The latest version of maia covers following filters:
 
 - Lowpass Filter (LPF)
 - Bandpass Filter (BPF)
 
-in either *butterworth* or *chebyshev* characteristic.
+in either *butterworth* or *chebyshev* type.
 
 Then you can either see the cartesian graph of filter characteristics, S-parameter and group delay by a method *.plot_summary()*
 
