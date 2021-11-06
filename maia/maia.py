@@ -8,7 +8,7 @@ import schemdraw
 import schemdraw.elements as elm
 
 
-from maia_functions import *
+from .maia_functions import *
 
 pi = np.pi
 sqrt = np.sqrt
