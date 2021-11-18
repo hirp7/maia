@@ -1,12 +1,12 @@
-# maia, microwave passive filter design assistant 
-is a support tool for RF passive filter design based on the insertion loss method.
+# maia, microwave analytically integrated-design assistant 
+is a support tool for RF circuit design, especially for microwave passive filter design at this moment.
 
 The latest version of maia covers following filters:
 
 - Lowpass Filter (LPF)
 - Bandpass Filter (BPF)
 
-in either *butterworth* or *chebyshev* type.
+in either *butterworth* or *chebyshev* type based on insertion loss method.
 
 Using integrated modules, one can obtain filter design parameters such as g-parameters for LC-ladder circuit, transformed inductance and capacitance LC from the princple LPF, and *network* object in ```scikit-rf```.
 Depending on a filter requirement such as the cut-off frequency for LPF or the center of frequency for BPF *fc*, fractional bandwidth *FBW* (for BPF), ripple band *Lar* in dB (for chebyshev-type), and the number of stage *N*, a object *LowPassFilter* or *BandPassFilter* is easily defined as shown below:
