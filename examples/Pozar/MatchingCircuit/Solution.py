@@ -80,18 +80,24 @@ matching network and the load is smaller.
 """
 
 from skrf.media import MLine
-freq = rf.Frequency(2,2,1,unit = 'ghz')
+freq = rf.Frequency(2,2,1,unit = 'ghz') #2 GHz
 Line = MLine(frequency = freq, w = 0.483e-3,h = 0.5e-3,t = 0.01e-3, ep_r = 9.9) #Alumina line
 
-def shunt_stub(Z0,Y0,Zl): #Y0 is characteristic impedance of stub
-        
+def shunt_stub(Z0,Zl,Frequency,Line,stub_type = 'open'): #Y0 is characteristic impedance of stub
+    c0 = 2.997924e8
     Rl,Xl = [Zl.real,Zl.imag]    
     #Shunt Stub
     t1 = (Xl + sqrt(Rl/Z0*((Z0 - Rl)**2 + Xl**2)))/(Rl - Z0) 
     t2 = (Xl - sqrt(Rl/Z0*((Z0 - Rl)**2 + Xl**2)))/(Rl - Z0) 
     t = np.array([t1,t2])
-    d = arctan(t)/beta_c #d is a distance and beta_c can be derived by line parameter
+    d = arctan(t)/Line.beta #d is a distance and beta can be derived by line parameter
     
-    G = Rl*(1 + t**2)/(Rl**2 + (Xl + Z0*t)**2)
+    #G = Rl*(1 + t**2)/(Rl**2 + (Xl + Z0*t)**2)
     B = (Rl**2*t - (Z0 - Xl*t)*(Xl + Z0*t))/Z0/(Rl**2 + (Xl + Z0*t)**2)
-    
+    lambda0 = c0/freq.f
+    if stub_type == 'open':
+        l = -lambda0/(2*pi)*arctan(Line.z0*B)
+    else: #short
+        l = -lambda0/(2*pi)*arctan(1/Line.z0/B)
+        
+    return [d,l]
