@@ -32,31 +32,70 @@ inv,det = [np.linalg.inv,np.linalg.det]
 sqrt = np.sqrt
 arctan = np.arctan
 
+class MatchingCircuit(object):
+    def __init__(self,Z0,Zl,frequency):
+        self.Z0 = Z0
+        self.Rl,self.Xl = [Zl.real,Zl.imag] #lumped element
+        self.Zm,self.circuit_type = self.analytical() #reactance and susceptance
+        self.LC = self.lumped_expansion()
+        #calculated inductance and capacitance to output of Network file
+        
 
-def Matching_Zm(Zl,Z0): #the load impedance is inside the 1+1j, i.e. Rl is larger than Z0
-    Rl,Xl = [Zl.real,Zl.imag]
-    B1 = (Xl + sqrt(Rl/Z0)*sqrt(Rl**2 + Xl**2 - Z0*Rl))/(Rl**2 + Xl**2)
-    B2 = (Xl - sqrt(Rl/Z0)*sqrt(Rl**2 + Xl**2 - Z0*Rl))/(Rl**2 + Xl**2)
+    def analytical(self): #LC or CL
+        if self.Rl >= self.Z0:
+            self.B1 = (self.Xl + sqrt(self.Rl/self.Z0)*sqrt(self.Rl**2 + self.Xl**2 - self.Z0*self.Rl))/(self.Rl**2 + self.Xl**2)
+            self.B2 = (self.Xl - sqrt(self.Rl/self.Z0)*sqrt(self.Rl**2 + self.Xl**2 - self.Z0*self.Rl))/(self.Rl**2 + self.Xl**2)
+        
+            self.X1 = 1/self.B1 + self.Xl*self.Z0/self.Rl - self.Z0/self.B1/self.Rl
+            self.X2 = 1/self.B2 + self.Xl*self.Z0/self.Rl - self.Z0/self.B2/self.Rl
+            self.Zm1 = [self.X1,self.B1]
+            self.Zm2 = [self.X2,self.B2]
+            self.circuit_type = 'Impedance'
+            return [self.Zm1,self.Zm2],self.circuit_type
+            
+            
+        else: #circuit_type == 'Admittance'
+            self.X1 = sqrt(self.Rl*(self.Z0-self.Rl)) - self.Xl
+            self.X2 = -sqrt(self.Rl*(self.Z0-self.Rl)) - self.Xl
+            
+            self.B1 = sqrt((self.Z0 - self.Rl)/self.Rl)/self.Z0
+            self.B2 = -sqrt((self.Z0 - self.Rl)/self.Rl)/self.Z0
+            self.Ym1 = [self.X1,self.B1]
+            self.Ym2 = [self.X2,self.B2]
+            self.circuit_type = 'Admittance'        
+            return [self.Ym1,self.Ym2]
+        
+        def lumped(self):
+            if self.circuit_type == 'impedance': #from Zm to LC
+                L1 = self.X2LC(self.X1)
+                C2 = self.B2LC(self.B1)
+                
+            if self.circuit_type == 'admittance': #from Ym to LC
+                C1 = self.B2LC(self.X1)
+                L2 = self.X2LC(self.B1)      
+        def X2LC(self,X):
+            if x > 0: #
+                L_flag = True
+                return X/(2*pi*self.frequency),L_flag
+            else: #C
+                L_flag= False
+                return 1/(2*pi*self.frequency*X),L_flag
+            
+        def B2LC(self,B):
+            if B > 0:
+                C_flag = True
+                return B/(2*pi*self.frequency),C_flag
+            else:
+                C_flag = False
+                return 1/(2*pi*self.frequency*B),C_flag
+            
+        
+    def stub(Line): #series or shunt
+        
+test = MatchingCircuit(100,50+20j,500e6)
 
-    X1 = 1/B1 + Xl*Z0/Rl - Z0/B1/Rl
-    X2 = 1/B2 + Xl*Z0/Rl - Z0/B2/Rl
-    Zm1 = [X1,B1]
-    Zm2 = [X2,B2]
-
-    return [Zm1,Zm2]
 
 
-def Matching_Ym(Zl,Z0): #the load impedance is outside the 1+1j, i.e. Rl is smaller than Z0
-    Rl,Xl = [Zl.real,Zl.imag]
-    X1 = sqrt(Rl*(Z0-Rl)) -Xl
-    X2 = -sqrt(Rl*(Z0-Rl)) - Xl
-    
-    B1 = sqrt((Z0 - Rl)/Rl)/Z0
-    B2 = -sqrt((Z0 - Rl)/Rl)/Z0
-    Ym1 = [X1,B1]
-    Ym2 = [X2,B2]
-
-    return [Ym1,Ym2]
 
 
     
