@@ -31,13 +31,42 @@ inv,det = [np.linalg.inv,np.linalg.det]
 
 sqrt = np.sqrt
 arctan = np.arctan
-
 class MatchingCircuit(object):
+    """
+    class MatchingCircuit(Z0,Zl,frequency)
+    input parameters are following:
+        Z0: source impedance, real value
+        Zl: load impedance, complex value
+        frequency: matching frequency
+        
+    method
+        *initial methods
+        .analytical()
+            calculates analytical reactance X and susceptance B of the matching circuit
+            there are two types of circuit, impedance circuit or admittance circuit
+            in accordance with the relation between the load impedance and the source impedance.
+            if the load impedance is larger than source impedance, i.e. located at outside 1+1j circle in a smith chart,
+            impedance circuit is chosen. If not, admittance circuit.
+            
+        .lumped()
+            determines lumped element value from analytical solutions above
+            generates also schematic class using schemdraw
+            
+        *others
+        .stub()
+            with given line information such as characteristic impedance and propagation constant of microstrip line or waveguide,
+            single-stub matching circuit is constructed
+        .quarter()
+            with given line information such as characteristic impedance and propagation constant of microstrip line or waveguide,
+            a single quarter-wavelength circuit is constructed
+        
+    """
+
     def __init__(self,Z0,Zl,frequency):
         self.Z0 = Z0
         self.Rl,self.Xl = [Zl.real,Zl.imag] #lumped element
-        self.Zm,self.circuit_type = self.analytical() #reactance and susceptance
-        self.LC = self.lumped_expansion()
+        self.XB1,self,XB2,self.circuit_type = self.analytical() #reactance and susceptance
+        self.lumped_expansion()
         #calculated inductance and capacitance to output of Network file
         
 
@@ -48,10 +77,10 @@ class MatchingCircuit(object):
         
             self.X1 = 1/self.B1 + self.Xl*self.Z0/self.Rl - self.Z0/self.B1/self.Rl
             self.X2 = 1/self.B2 + self.Xl*self.Z0/self.Rl - self.Z0/self.B2/self.Rl
-            self.Zm1 = [self.X1,self.B1]
-            self.Zm2 = [self.X2,self.B2]
-            self.circuit_type = 'Impedance'
-            return [self.Zm1,self.Zm2],self.circuit_type
+            #self.Zm1 = [self.X1,self.B1]
+            #self.Zm2 = [self.X2,self.B2]
+            self.circuit_type = 'impedance'
+            return [self.X1,self.B1],[self.X2,self.B2],self.circuit_type
             
             
         else: #circuit_type == 'Admittance'
@@ -60,19 +89,41 @@ class MatchingCircuit(object):
             
             self.B1 = sqrt((self.Z0 - self.Rl)/self.Rl)/self.Z0
             self.B2 = -sqrt((self.Z0 - self.Rl)/self.Rl)/self.Z0
-            self.Ym1 = [self.X1,self.B1]
-            self.Ym2 = [self.X2,self.B2]
-            self.circuit_type = 'Admittance'        
-            return [self.Ym1,self.Ym2]
+            self.circuit_type = 'admittance'        
+            return [self.B1,self.X1],[self.B2,self.X2],self.circuit_type
         
-        def lumped(self):
+        
+        
+        def lumped(self,XB):
             if self.circuit_type == 'impedance': #from Zm to LC
-                L1 = self.X2LC(self.X1)
-                C2 = self.B2LC(self.B1)
+                L1,L_flag = self.X2LC(XB[0])
+                C2,C_flag = self.B2LC(XB[1])
+                
+                if L_flag == True:
+                    self.L = skrf.Inducgtor()
+                    self.C = skrf.shunt_Capacitor()
+                    self.LC = self.L**self.C
+                else:
+                    self.C = skrf.Capacitor()
+                    self.L = skrf.shunt_Inductor
+                    self.LC = self.C**self.L                    
                 
             if self.circuit_type == 'admittance': #from Ym to LC
-                C1 = self.B2LC(self.X1)
-                L2 = self.X2LC(self.B1)      
+                C1,C_flag = self.B2LC(XB[0])
+                L2,L_flag = self.X2LC(XB[1])     
+                
+                if C_flag == True:
+                    self.C = skrf.shunt_capacitor()
+                    self.L = skrf.inductor()
+                    self.LC = self.C ** self.L
+                else:
+                    self.L = skrf.shunt_inductor()
+                    self.C = skrf.capacitor()
+                    self.LC = self.L ** self.C
+                    
+                    
+        def schematic_lumped(self):
+            
         def X2LC(self,X):
             if x > 0: #
                 L_flag = True
