@@ -1,4 +1,4 @@
-# maia, microwave analytically integrated-design assistant 
+# maia, microwave analytical integrated-design assistant 
 is a support tool for RF circuit design, especially for microwave passive filter design at this moment.
 
 The latest version of maia covers following filters:
