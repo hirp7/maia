@@ -195,15 +195,12 @@ class MatchingCircuit(object):
             there are two types of circuit, impedance circuit or admittance circuit
             in accordance with the relation between the load impedance and the source impedance.
             if the load impedance is larger than source impedance, i.e. located at outside 1+1j circle in a smith chart,
-            impedance circuit is chosen. If not, admittance circuit
+            impedance circuit is chosen. If not, admittance circuit.
             
-        .find_lumped()
+        .lumped()
             determines lumped element value from analytical solutions above
             generates also schematic class using schemdraw
             
-        .schematic_LC()
-        .plot_summary()
-        
         *others
         .stub()
             with given line information such as characteristic impedance and propagation constant of microstrip line or waveguide,
@@ -234,8 +231,6 @@ class MatchingCircuit(object):
         self.schematic_size = self.schematic1.get_bbox()
         self.Network1,self.Network2 = [self.LC1[-1],self.LC2[-1]]
         self.matched1,self.matched2 = [self.Network1**self.load,self.Network2**self.load]
-        
-        
     def solve_reactance(self): #LC or CL
         
         if self.Rl >= self.Z0:
@@ -284,7 +279,7 @@ class MatchingCircuit(object):
                 LCflag = False
                 Network =self.media.shunt_inductor(LC[0])**self.media.capacitor(LC[1])
         return LC,LCflag,Network
-        
+                
                 
     def schematic_LC(self,LC,flag):
         if self.circuit_type == 'impedance':
@@ -326,7 +321,6 @@ class MatchingCircuit(object):
                 d += elm.Resistor().down().label(str(self.Zl) + ' Ohm',rotate = True,loc = 'bottom')
                 d += elm.Line().left().tox(Start.start)
         return d
-
     
     def plot_summary(self,figsize = (8,4),hspace = 0.2,wspace = 0):
         
@@ -368,8 +362,54 @@ class MatchingCircuit(object):
             unit = 'u'
         return A,unit
         
-        
+    def define_media(self,w,h,t,Er,tanD): #microstril line or other line defined here
+        self.Line = MLine(frequency = self.Frequency, w = w,h = h,t = t, ep_r = Er,tand = tanD,z0 = self.Z0) #Alumina line
 
+    def shunt_stub(self,stub_type = 'open'): #Y0 is characteristic impedance of stub
+        #Shunt Stub
+        t1 = (self.Xl + sqrt(self.Rl/self.Z0\
+                             *((self.Z0 - self.Rl)**2 + self.Xl**2)))/(self.Rl - self.Z0) 
+        t2 = (self.Xl - sqrt(self.Rl/self.Z0\
+                             *((self.Z0 - self.Rl)**2 + self.Xl**2)))/(self.Rl - self.Z0) 
+        #t = np.array([t1,t2])
+        d1 = arctan(t1)/(2*pi*self.fc)*c0 #d is a distance and beta can be derived by line parameter
+        d2 = arctan(t2)/(2*pi*self.fc)*c0 #d is a distance and beta can be derived by line parameter
+        line_extend1 = self.Line.line(d1,unit = 'm')
+        line_extend2 = self.Line.line(d2,unit = 'm')
+        #G = Rl*(1 + t**2)/(Rl**2 + (Xl + Z0*t)**2)
+        B1 = (self.Rl**2*t1 - (self.Z0 - self.Xl*t1)*(self.Xl + self.Z0*t1))/self.Z0/(self.Rl**2 + (self.Xl + self.Z0*t1)**2)
+        B2 = (self.Rl**2*t2 - (self.Z0 - self.Xl*t2)*(self.Xl + self.Z0*t1))/self.Z0/(self.Rl**2 + (self.Xl + self.Z0*t2)**2)
+
+        lambda0 = c0/self.fc
+        if stub_type == 'open':
+            l1 = -lambda0/(2*pi)*arctan(self.Line.z0*B1)
+            l2 = -lambda0/(2*pi)*arctan(self.Line.z0*B2)
+
+            stub_shunt = [self.Line.shunt_delay_open(i,unit = 'm') for i in [l1,l2]]
+        else: #short
+            l1 = -lambda0/(2*pi)*arctan(1/self.Line.z0/B1)
+            l2 = -lambda0/(2*pi)*arctan(1/self.Line.z0/B2)
+            stub_shunt = [self.Line.shunt_delay_short(i,unit = 'm') for i in [l1,l2]]
+
+        #shunt_line
+        stub1 = stub_shunt[0]**line_extend1
+        stub2 = stub_shunt[1]**line_extend2
+        
+        
+        self.stub_matched1 = stub1 ** self.load
+        self.stub_matched2 = stub2 ** self.load
+        #self.matched1,self.matched2 = [self.Network1**self.load,self.Network2**self.load]
+
+        return [self.stub_matched1,self.stub_matched2]
+    #def quarter(self): #single section of quarter wavelength
+    """
+    One drawback of the quarter-wave transformer is that it can only match a real load
+    impedance. A complex load impedance can always be transformed into a real impedance,
+    however, by using an appropriate length of transmission line between the load and the
+    transformer, or an appropriate series or shunt reactive element.
+    """
+    #    return 0
+    
 
         #def schematic_lumped(self):
     """
@@ -389,4 +429,4 @@ class MatchingCircuit(object):
             C_flag = False
             return 1/(2*pi*self.frequency*B),C_flag
     """  
-
+            
